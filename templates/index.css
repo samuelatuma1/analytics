@@ -1,0 +1,172 @@
+:root{
+    --font: verdana;
+}
+
+html, body{
+    font-family: var(--font);
+    scroll-behavior: smooth;
+}
+
+input{
+    display: block;
+    padding: 6px;
+    border: 1px solid rgb(218, 214, 214);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    transition: 0.3s linear;
+}
+
+input:hover{
+    box-shadow: 0px 1px 10px 0px rgb(191, 190, 190);
+}
+h1{
+    font-weight: lighter;
+}
+form > button, .submit{
+    background-color: teal;
+    border: 1px solid teal;
+    color: white;
+    padding: 8px;
+    border-radius: 3px;
+    border-bottom-left-radius: 10px;
+}
+
+form > button:hover, .submit:hover{
+    box-shadow: 0px 1px 8px 0px teal;
+    cursor: pointer;
+}
+form{
+    width: 95%;
+    padding: 10px;
+    border: 1px solid rgb(252, 252, 252);
+    margin: auto;
+    border-radius: 20px;
+    transition: 0.2s linear;
+    margin-bottom: 15px;
+}
+form:hover{
+    box-shadow: 0px 1px 10px 0px rgb(155, 154, 154);
+}
+.addedInvestments{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    
+}
+.addedInvestments > div{
+    width: 30%;
+    border: 1px solid rgb(245, 242, 242);
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    transition: 0.3s ease-in-out;
+    margin-bottom: 15px;
+    box-shadow: 0px 0px 8px 0px rgb(242, 237, 237);
+}
+.addedInvestments > div:hover{
+    border-radius: 20px;
+    box-shadow: 0px 0px 18px 0px rgb(222, 215, 215);
+
+}
+.addedInvestments > div ul{
+    padding: 0;
+}
+
+.addedInvestments > div li{
+    list-style-type: none;
+    border-bottom: 1px solid rgb(244, 243, 243);
+}
+.addedInvestments > div li:last-child{
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 13px;
+    border-bottom: 0px solid transparent;
+}
+.addedInvestments > div li > button{
+    background-color: maroon;
+    color: rgb(252, 233, 233);
+    border: 1px solid maroon;
+    border-radius: 10px;
+    padding: 5px;
+    cursor: pointer;
+    box-shadow: 0px 2px 10px 0px rgb(216, 137, 137);
+}
+@media screen and (max-width: 600px){
+    input[type='text']{
+        width: 90%;
+    }
+    .addedInvestments > div{
+        width: 75%;
+        
+    }
+}
+h3{
+    text-align: center;
+    box-shadow: 0px 1px 8px 0px rgb(225, 223, 223);
+    border-radius: 10px;
+    padding: 10px;
+    font-weight:lighter
+}
+@media screen and (min-width: 600px){
+    form{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-evenly;
+    }
+    form > label{
+        width: 33%;
+        display: flex;
+        justify-content: center;
+    }
+    
+
+}
+.submit{
+    display: block;
+    margin: auto;
+}
+.hide{
+    display: none;
+}
+
+
+
+section table{
+    border: 1px solid transparent;
+    box-shadow: 0px 1px 15px 0px rgb(238, 238, 238);
+    padding: 25px;
+    border-radius: 15px;
+    margin: auto;
+    transition: 0.5s linear;
+    text-align: center;
+    min-width: 75%;
+    border-collapse: collapse;
+    
+}
+section table:hover{
+    box-shadow: 0px 1px 25px 0px rgb(218, 217, 217);
+    border-radius: 24px;
+    padding: 35px;
+    font-size: 1.05em;
+    
+    
+}
+
+section th, td{
+    padding: 15px;
+}
+tr:nth-of-type(2n){
+    background-color: rgb(233, 245, 245);
+}
+section table thead tr{
+    font-weight: lighter;
+}
+section table thead tr th{
+    font-weight: lighter;
+    background-color: black;
+    color: white;
+    
+   
+}

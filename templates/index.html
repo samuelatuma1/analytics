@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+</head>
+<body>
+    <h1 id='amount_available'>Decision Assistant</h1>
+    <div class="available">
+        <form class='available'>
+            <label for="available">
+                Total Available Investment: <input type='number' id='available' min='100' max='100000000' step="100" required>
+            </label>
+        </form>
+    </div>
+    <form class='investment'>
+        <label for="investment">
+            Investment: <input type='text' id='investment' minlength='1' value='xyz' required>
+        </label>
+        
+        <label for="revenue">
+            Potential Revenue: <input type='number' id='revenue' min='100' max='1000000' step="10" value='1000'required>
+        </label>
+    
+        <label for="cost">
+            Cost: <input type='number' id='cost' min='50' max='1000000' step="10" value='100'required>
+        </label>
+
+        <button>add Investment</button>
+    </form>
+
+<section id="analysis">
+   
+</section>
+<h3>Investment Options</h3>
+    <div class="addedInvestments"></div>
+    <button class='submit hide'>Analyze Investments</button>
+    
+    <script>
+        document.body.onload = () => {
+            let submit = document.querySelector(".submit")
+            displayInvestments()
+            const form = document.querySelector(".investment")
+            form.addEventListener('submit', addInvestment)
+
+            function addInvestment(e){
+                e.preventDefault()
+                const investment = document.querySelector("#investment").value
+                const revenue = Number(document.querySelector("#revenue").value)
+                const cost = Number(document.querySelector("#cost").value)
+                addToInvestment(investment, revenue, cost)
+            }
+
+        function addToInvestment(investment, revenue, cost){
+            if (!localStorage.getItem('potentialInvestments')){
+                localStorage.setItem('potentialInvestments', JSON.stringify({
+                    "investments": [],
+                    "available_fund" : 0
+                }))
+            }
+            let potentialInvestsments = JSON.parse(localStorage.getItem('potentialInvestments'))
+            let new_investment = {
+                "investment": investment,
+                "revenue": revenue,
+                "cost": cost
+            }
+            for(let new_invest of potentialInvestsments['investments']){
+                if(new_invest.investment == new_investment.investment){
+                    alert("You have already added investment to list. ")
+                    return
+                }
+            }
+            potentialInvestsments['investments'].push(new_investment)
+            
+            localStorage.setItem('potentialInvestments', JSON.stringify(potentialInvestsments))
+
+            displayInvestments()
+        }
+
+        function displayInvestments(){
+            if(!localStorage.getItem('potentialInvestments')){
+                return
+            }
+            let submit = document.querySelector(".submit")
+            const investmentsDiv =  document.querySelector(".addedInvestments")
+            investmentsDiv.innerHTML = ""
+            let potentialInvestsments = JSON.parse(localStorage.getItem('potentialInvestments'))
+            const investments = potentialInvestsments['investments']
+            if(investments.length < 1){
+                submit.classList.add("hide")
+                return
+            }
+            submit.classList.remove("hide")
+            
+            for(let investment of investments){
+                let div = document.createElement('div')
+                div.innerHTML = `
+                <ul class="investment">
+                    <li>Investment Name: ${investment.investment}</li>
+                    <li>Cost: ${investment.cost}</li>
+                    <li>Potential Revenue: ${investment.revenue}</li>
+                    <li><button class="rmv" data-id="${investment.investment}">Remove</button></li>
+                </ul>
+                
+                `
+                investmentsDiv.append(div)
+            }
+
+        }
+        
+        // Remove Investment
+        document.body.addEventListener("click", (e) => {
+            if(e.target.classList.contains('rmv')){
+                let investment = e.target.getAttribute("data-id")
+                removeInvestment(investment)
+            }
+        })
+
+        function removeInvestment(investmentName){
+            let potentialInvestsments = JSON.parse(localStorage.getItem('potentialInvestments'))
+            const investments = potentialInvestsments['investments']
+            
+            for(let investment of potentialInvestsments['investments']){
+                let idx = potentialInvestsments['investments'].indexOf(investment)
+                if(investment.investment == investmentName){
+                    potentialInvestsments['investments'].splice(idx, 1)
+                    localStorage.setItem('potentialInvestments', JSON.stringify(potentialInvestsments))
+                    displayInvestments();
+                    return
+
+                }
+            }
+        }
+
+        submit.addEventListener("click", submitInvestments)
+
+        function submitInvestments(e){
+            if(!localStorage.getItem('potentialInvestments')){
+                alert("No data to analyze")
+                return
+            }
+            let available =  document.querySelector("#available")
+            if(available.value < 10){
+                alert("Current investment budget not sufficient ")
+                window.location.href= '?#amount_available'
+                return
+            }
+            let available_amount = Number(available.value)
+            let potentialInvestsments = JSON.parse(localStorage.getItem('potentialInvestments'))
+            potentialInvestsments.available_fund = available_amount
+            
+
+            let form = new FormData
+            form.append("investmentData", JSON.stringify(potentialInvestsments))
+            
+            fetch('{{ url_for("index") }}', {"method": "POST", "body": form})
+            .then(data => data.json()).then(res => displayAnalysis(res))
+
+            function displayAnalysis(analysisReport){
+                if(typeof analysisReport != "object") {
+                    
+                    return
+                }
+                if(analysisReport.hasOwnProperty("best_investments")){
+                    const analysis = document.querySelector("#analysis")
+                    analysis.innerHTML = ""
+                    const h3 = document.createElement("h3")
+                    h3.innerHTML = "Here is an intelligent decision plan our algorithm came up with"
+                    analysis.appendChild(h3)
+
+                    const table = document.createElement("table")
+                    const thead = document.createElement("thead")
+                    thead.innerHTML = `
+                    <tr>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>Budget</th>
+                        <th>Revenue</th>
+                        <th>Expected Profit</th>
+                    </tr>
+                    `
+                    table.appendChild(thead)
+                    // {'best_investments': [{'investment': 'Tesla', 'revenue': 24000, 'cost': 8000},
+                    //   {'investment': 'Microsoft', 'revenue': 19600, 'cost': 5800}],
+                    //  'available_balance': 6200}
+                    const investments = analysisReport["best_investments"]
+                    
+                    let spending = 0
+                    var rank = 1
+                    let revenue = 0
+                    const tbody = document.createElement("tbody")
+                    for (let investment of investments){
+                        const tr = document.createElement("tr")
+                        tr.innerHTML = `
+                        <td>${rank}</td>
+                        <td>${investment.investment}</td>
+                        <td>$${investment.cost}</td>
+                        <td>$${investment.revenue}</td>
+                        <td>$${investment.revenue - investment.cost}</td>
+                        `
+                        tbody.append(tr)
+                        spending += investment.cost
+                        revenue += investment.revenue
+
+                        rank += 1
+                    }
+                    let tr = document.createElement("tr")
+                    table.append(tbody)
+                    tr.classList.add("summaryRow")
+                    tr.innerHTML = `
+                        <td>Total</td>
+                        <td> </td>
+                        <td>$${spending}</td>
+                        <td>$${revenue}</td>
+                        <td>$${revenue - spending}</td>
+                        `
+                    tbody.append(tr)
+                    analysis.appendChild(table)
+
+                    // 
+                    const p = document.createElement("p")
+                    p.classList.add("available_balance")
+                    p.style.textAlign = 'center'
+                    p.innerHTML = `
+                        Following this investment decision plan will leave 
+                        a balance of $${analysisReport["available_balance"]}
+                    `
+                    analysis.append(p)
+
+
+                    window.location.href= '?#analysis'
+                
+                }
+            }
+        }
+    }
+
+    </script>
+    
+</body>
+</html>
