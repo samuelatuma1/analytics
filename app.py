@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 app = Flask(__name__)
 
-from assignments_solutuions import *
+from assignments_solutions import *
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
